@@ -16,6 +16,8 @@ namespace detri
         m_impl->logger->set_level(static_cast<spdlog::level::level_enum>(level));
     }
 
+    logger::~logger() = default;
+
     void logger::write(log_level level, const char* msg) const
     {
         m_impl->logger->log(static_cast<spdlog::level::level_enum>(level), msg);
@@ -40,9 +42,10 @@ namespace detri
 
     log_service::log_service(const log_config& config)
     {
-        auto spdlog_default = spdlog::default_logger();
+        const auto spdlog_default = spdlog::default_logger();
         spdlog_default->set_level(static_cast<spdlog::level::level_enum>(config.level));
-        spdlog_default->sinks().emplace_back(std::make_shared<spdlog::sinks::rotating_file_sink_mt>(config.base_filename, 1024 * 1024 * 2, 3, true));
+        spdlog_default->sinks().emplace_back(
+            std::make_shared<spdlog::sinks::rotating_file_sink_mt>(config.base_filename, 1024 * 1024 * 2, 3, true));
     }
 
     log_service::~log_service()
@@ -50,7 +53,7 @@ namespace detri
         spdlog::shutdown();
     }
 
-    // Intentionally a member to ensure logging backend is configured before loggers can be created
+    // ReSharper disable once CppMemberFunctionMayBeStatic
     logger log_service::get(const std::string& name) const // NOLINT(*-convert-member-functions-to-static)
     {
         return logger{name};

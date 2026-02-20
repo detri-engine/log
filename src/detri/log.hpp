@@ -20,17 +20,24 @@ namespace detri
     class logger
     {
         friend class log_service;
+
     public:
         logger() = delete;
-        ~logger() = default;
+
+        ~logger();
 
         logger(const logger&) = delete;
+
         logger& operator=(const logger&) = delete;
+
         logger(logger&&) = default;
+
         logger& operator=(logger&&) = default;
 
         void set_level(log_level level) const;
+
         void write(log_level level, const char* msg) const;
+
         void flush() const;
 
         template<typename... Args>
@@ -74,8 +81,10 @@ namespace detri
             const auto formatted = fmt::format(msg, std::forward<Args>(args)...);
             write(log_level::critical, formatted.c_str());
         }
+
     protected:
         explicit logger(const std::string& name);
+
     private:
         struct impl;
         std::unique_ptr<impl> m_impl;
@@ -91,11 +100,15 @@ namespace detri
     {
     public:
         explicit log_service(const log_config& config);
+
         ~log_service();
 
         log_service(const log_service&) = delete;
+
         log_service& operator=(const log_service&) = delete;
+
         log_service(log_service&&) = delete;
+
         log_service& operator=(log_service&&) = delete;
 
         [[nodiscard]] logger get(const std::string& name) const;
